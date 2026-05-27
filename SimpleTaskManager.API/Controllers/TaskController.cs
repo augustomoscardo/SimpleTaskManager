@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SimpleTaskManager.Application.UseCases.Task.Register;
+using SimpleTaskManager.Communication.Requests;
+using SimpleTaskManager.Communication.Responses;
 
 namespace SimpleTaskManager.API.Controllers;
 
@@ -23,10 +26,22 @@ public class TaskController : ControllerBase
     }
 
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    public IActionResult Create()
+    [ProducesResponseType(typeof(ResponseRegisterTaskJson), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status400BadRequest)]
+    public IActionResult Create([FromBody] RequestRegisterTaskJson request)
     {
-        return Ok();
+        var useCase = new RegisterTaskUseCase();
+
+        var validation = useCase.Validate(request);
+
+        if (validation?.Errors.Count > 0)
+        {
+            return BadRequest(validation.Errors);
+        }
+
+        var response = useCase.Execute(request);
+
+        return Created(string.Empty, response);
     }
 
     [HttpPut]
