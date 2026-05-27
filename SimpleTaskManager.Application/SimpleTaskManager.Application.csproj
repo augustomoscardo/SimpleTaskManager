@@ -10,4 +10,8 @@
     <Folder Include="UseCases\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleTaskManager.Communication\SimpleTaskManager.Communication.csproj" />
+  </ItemGroup>
+
 </Project>
