@@ -44,6 +44,11 @@ public class RegisterTaskUseCase
             errors.AddError("Name exceded 100 characters.");
         }
 
+        if (request.Description.Length > 500)
+        {
+            errors.AddError("Description exceded 100 characters.");
+        }
+
         if (!Enum.IsDefined(request.Priority))
         {
             errors.AddError("Priority value not valid.");
@@ -52,6 +57,13 @@ public class RegisterTaskUseCase
         if (!Enum.IsDefined(request.Status))
         {
             errors.AddError("Status value not valid.");
+        }
+
+        var today = DateOnly.FromDateTime(DateTime.Today);
+
+        if (request.DueDate < today)
+        {
+            errors.AddError("Due date can't be previous than today.");
         }
 
         if (errors.Errors.Count > 0)
