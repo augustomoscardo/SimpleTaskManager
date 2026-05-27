@@ -1,1 +1,5 @@
-<Solution />
+<Solution>
+  <Project Path="../../../../../../Rocketseat/.net/challenges/SimpleTaskManager/SimpleTaskManager.API/SimpleTaskManager.API.csproj" />
+  <Project Path="../../../../../../Rocketseat/.net/challenges/SimpleTaskManager/SimpleTaskManager.Application/SimpleTaskManager.Application.csproj" />
+  <Project Path="../../../../../../Rocketseat/.net/challenges/SimpleTaskManager/SimpleTaskManager.Communication/SimpleTaskManager.Communication.csproj" />
+</Solution>
