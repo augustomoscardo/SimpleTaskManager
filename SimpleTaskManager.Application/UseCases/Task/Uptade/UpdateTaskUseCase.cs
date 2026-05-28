@@ -1,36 +1,34 @@
 ﻿using SimpleTaskManager.Application.Entities;
 using SimpleTaskManager.Application.Mocks;
-using SimpleTaskManager.Communication.Enums;
 using SimpleTaskManager.Communication.Requests;
 using SimpleTaskManager.Communication.Responses;
-using System.Data;
 
-namespace SimpleTaskManager.Application.UseCases.Task.Register;
+namespace SimpleTaskManager.Application.UseCases.Task.Uptade;
 
-public class RegisterTaskUseCase
+public class UpdateTaskUseCase
 {
-    public ResponseRegisterTaskJson Execute(RequestRegisterTaskJson request)
+    public ResponseErrorsJson? Execute(Guid id, RequestUpdateTaskJson request)
     {
-        var newTask = new TaskItem
-        {
-            Id = Guid.NewGuid(),
-            Name = request.Name,
-            Description = request.Description,
-            Priority = request.Priority,
-            DueDate = request.DueDate,
-            Status = request.Status,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
+        var taskToUpdate = TaskMockData.Tasks.FirstOrDefault(task => task.Id == id);
 
-        return new ResponseRegisterTaskJson
+        if (taskToUpdate == null)
         {
-            Id = newTask.Id,
-            Name = newTask.Name,
-        };
+            var errors = new ResponseErrorsJson();
+            errors.AddError("Task not found.");
+            return errors;
+        }
+
+        taskToUpdate.Name = request.Name;
+        taskToUpdate.Description = request.Description;
+        taskToUpdate.Priority = request.Priority;
+        taskToUpdate.DueDate = request.DueDate;
+        taskToUpdate.Status = request.Status;
+        taskToUpdate.UpdatedAt = DateTime.UtcNow;
+
+        return null;
     }
 
-    public ResponseErrorsJson? Validate(RequestRegisterTaskJson request)
+    public ResponseErrorsJson? Validate(RequestUpdateTaskJson request)
     {
         var errors = new ResponseErrorsJson();
 
@@ -70,6 +68,7 @@ public class RegisterTaskUseCase
         {
             errors.AddError("Due date can't be previous than today.");
         }
+
 
         return errors;
     }
