@@ -62,12 +62,12 @@ public class UpdateTaskUseCase
             errors.AddError("Status value not valid.");
         }
 
-        var today = DateOnly.FromDateTime(DateTime.Today);
+        //var today = DateOnly.FromDateTime(DateTime.Today);
 
-        if (request.DueDate < today)
-        {
-            errors.AddError("Due date can't be previous than today.");
-        }
+        //if (request.DueDate < today)
+        //{
+        //    errors.AddError("Due date can't be previous than today.");
+        //}
 
 
         return errors;
