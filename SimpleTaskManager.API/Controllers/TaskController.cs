@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using SimpleTaskManager.Application.UseCases.Task.Delete;
+using SimpleTaskManager.Application.UseCases.Task.GetAll;
+using SimpleTaskManager.Application.UseCases.Task.GetById;
 using SimpleTaskManager.Application.UseCases.Task.Register;
+using SimpleTaskManager.Application.UseCases.Task.Uptade;
 using SimpleTaskManager.Communication.Requests;
 using SimpleTaskManager.Communication.Responses;
 
@@ -12,17 +15,36 @@ public class TaskController : ControllerBase
 {
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public IActionResult GetAll()
     {
-        return Ok();
+        var useCase = new GetAllTasksUseCase();
+
+        var response = useCase.Execute();
+
+        if (response.Tasks.Count < 0)
+        {
+            return NotFound();
+        }
+
+        return Ok(response);
     }
 
     [HttpGet]
     [Route("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult GetById(Guid id)
-    {   
-        return Ok();
+    {
+        var useCase = new GetTaskByIdUseCase();
+
+        var response = useCase.Execute(id);
+
+        if (response == null)
+        {
+            return NotFound("Task not found");
+        }
+
+        return Ok(response);
     }
 
     [HttpPost]
@@ -32,11 +54,11 @@ public class TaskController : ControllerBase
     {
         var useCase = new RegisterTaskUseCase();
 
-        var validation = useCase.Validate(request);
+        var errors = useCase.Validate(request);
 
-        if (validation?.Errors.Count > 0)
+        if (errors?.Errors.Count > 0)
         {
-            return BadRequest(validation.Errors);
+            return BadRequest(errors.Errors);
         }
 
         var response = useCase.Execute(request);
@@ -47,16 +69,41 @@ public class TaskController : ControllerBase
     [HttpPut]
     [Route("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public IActionResult Update(Guid id)
+    public IActionResult Update([FromRoute] Guid id, [FromBody] RequestUpdateTaskJson request)
     {
+        var useCase = new UpdateTaskUseCase();
+
+        var errors = useCase.Validate(request);
+
+        if(errors?.Errors.Count > 0)
+        {
+            return BadRequest(errors.Errors);
+        }
+
+        var response = useCase.Execute(id, request);
+
+        if (response != null)
+        {
+            return NotFound("Task not found");
+        }
+
         return NoContent();
     }
 
     [HttpDelete]
     [Route("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public IActionResult Delete(Guid id)
+    public IActionResult Delete([FromRoute] Guid id)
     {
+        var useCase = new DeleteTaskUseCase();
+
+        var response = useCase.Execute(id);
+
+        if (response?.Errors.Count > 0)
+        {
+            return NotFound("Task not found");
+        }
+
         return NoContent();
     }
 }
